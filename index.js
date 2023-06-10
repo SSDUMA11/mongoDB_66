@@ -41,7 +41,7 @@ mongoose.connect(url)
         })
         .catch((err)=> {console.log(`DB connection error: ${err}`)});
 
-app.get('/', async (req, res) => {
+app.get('/', csrf, async (req, res) => {
     try {
      const title = {}
      let isAdmin = false;
@@ -57,7 +57,7 @@ app.get('/', async (req, res) => {
       isAdmin = false;
      }
       const users = await User.find();
-      res.render('index', {users, title, isAdmin})
+      res.render('index', {users, title, isAdmin, csrfToken: req.csrfToken()})
     } catch (err){
         console.log(err);
 }});
@@ -84,11 +84,11 @@ app.post('/add', async (req, res) => {
     }
 });
 
-app.get('/edit/:id', checkToken, async (req, res) => {
+app.get('/edit/:id',csrf, checkToken, async (req, res) => {
     try {
     const user = await User.findById(req.params.id);
     if (req.cookies.username) {
-    res.render('edit', {user});
+    res.render('edit', {user, csrfToken: req.csrfToken()});
     } else {
     res.redirect('/');
     }
@@ -97,14 +97,16 @@ app.get('/edit/:id', checkToken, async (req, res) => {
     }
 });
 
-app.post('/change-user/:id', async (req, res)=> {
+app.post('/change-user/:id',csrf, async (req, res)=> {
     try{
         await User.findByIdAndUpdate(req.params.id, req.body);
         res.redirect('/');
+        res.render('edit', { csrfToken: req.csrfToken() });
     } catch(err){
         console.log(err);
     }
 });
+
 
 app.delete('/remove/:id', async (req, res) => {
     try {

@@ -13,6 +13,7 @@ html(lang="en")
     if isAdmin
     h2 Add User
     form(action="/add" class="add" method="POST")
+      input(type='hidden', name='_csrf', value=csrfToken)
       label(for="name") Name:
       input(id="name" name="name" placeholder="Enter your name")
       label(for="age") Age:
@@ -52,3 +53,4 @@ html(lang="en")
           console.error('There was an error!', error);
         });
       }
+    
